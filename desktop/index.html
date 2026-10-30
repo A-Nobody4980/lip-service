@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src http://127.0.0.1:8780; img-src 'self' file: data:; media-src file: blob: http://127.0.0.1:8780; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lip Service</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="ls">
+  <div class="bar">
+    <img class="logo" src="icon-small.png" alt="">
+    <span class="bar-title">Lip Service</span>
+    <span class="wcs">
+      <button class="wc" id="wMin" type="button" aria-label="Minimize">&#8211;</button>
+      <button class="wc" id="wMax" type="button" aria-label="Maximize">&#9633;</button>
+      <button class="wc" id="wClose" type="button" aria-label="Close">&#215;</button>
+    </span>
+  </div>
+
+  <div class="body">
+    <div class="head">
+      <div class="title">Lip Service</div>
+      <div class="light" id="light"><b></b><span id="lightText">ComfyUI not running</span></div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div>
+          <p class="lab">1. Image</p>
+          <div class="zone img-zone pick" id="imageZone" tabindex="0" role="button" aria-label="Image: drop a file here or click to choose one">
+            <div class="empty" id="imageEmpty">Drop an image here, or click to choose one</div>
+            <img id="imageImg" alt="" hidden>
+            <div class="zone-name" id="imageName" hidden></div>
+            <button class="link" id="imageChange" type="button" hidden>Change file</button>
+            <div id="rings" hidden></div>
+          </div>
+          <input type="file" id="fileImage" accept=".png,.jpg,.jpeg,.webp,.bmp" hidden>
+          <div class="hint" id="multiHint" hidden>Multiple is on: click each face to mark a singer. Up to 4. Click a ring to remove it.</div>
+          <div class="err-line" id="imageErr" hidden></div>
+        </div>
+        <div>
+          <p class="lab">3. Prompt</p>
+          <textarea class="card prompt" id="prompt" spellcheck="false" placeholder="Describe the emotion and the action"></textarea>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card zone aud-zone pick" id="audioZone" tabindex="0" role="group" aria-label="Audio: drop a file here or click to choose one">
+          <p class="lab">2. Audio</p>
+          <div class="aud-file">
+            <span class="note-icon">&#9835;</span>
+            <span class="aud-name" id="audioName">Drop an audio file here, or click to choose one</span>
+            <button class="link" id="audioChange" type="button" hidden>Change file</button>
+            <span class="aud-dur" id="audioDur"></span>
+          </div>
+          <div class="hint s1note" id="s1note" hidden>This is the Singer 1 track.</div>
+          <div class="wave" id="wave">
+            <canvas id="waveCanvas"></canvas>
+            <div class="wave-empty" id="waveEmpty">No audio yet</div>
+            <div class="selbox" id="selBox" hidden>
+              <div class="handle hs" id="hStart"></div>
+              <div class="handle he" id="hEnd"></div>
+            </div>
+          </div>
+          <div class="trow">
+            <button class="btn" id="btnPlay" type="button">&#9654; Play selection</button>
+            <span class="tl pinkt">Start</span><input class="time" id="tStart" type="text" value="0:00.0" spellcheck="false" aria-label="Start time">
+            <span class="tl cyant">End</span><input class="time" id="tEnd" type="text" value="0:00.0" spellcheck="false" aria-label="End time">
+          </div>
+          <div class="err-line" id="timeErr" hidden></div>
+          <div class="err-line" id="audioErr" hidden></div>
+          <input type="file" id="fileAudio" accept=".wav,.mp3,.flac,.m4a,.ogg,.aac" hidden>
+          <div class="iso">
+            <button class="sw off" id="swIsolate" type="button" role="switch" aria-checked="false" aria-label="Isolate the vocal"><i></i></button>
+            <span>Isolate the vocal</span>
+            <span class="hint right" id="isoState">Off. For full mixes or noisy audio.</span>
+          </div>
+        </div>
+        <div>
+          <p class="lab">4. Singers</p>
+          <div class="btns"><button class="btn sel" id="btnSingle" type="button">Single</button><button class="btn" id="btnMulti" type="button">Multiple</button></div>
+          <div id="unisonRow" hidden>
+            <div class="btns top8"><button class="btn sel" id="btnSame" type="button">Same vocal for all</button><button class="btn" id="btnSeparate" type="button">Separate track each</button></div>
+            <div class="iso">
+              <button class="sw off" id="swSingAlong" type="button" role="switch" aria-checked="false" aria-label="Unmarked people sing along"><i></i></button>
+              <span>Unmarked people sing along</span>
+              <span class="hint right" id="singAlongHint">Off: only marked singers sing. On: everyone sings with the nearest singer.</span>
+            </div>
+            <div class="hint">Same vocal: everyone sings the one selection (unison). Separate: a drop zone appears per singer.</div>
+          </div>
+          <div id="extraTracks" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row top12">
+      <div class="col">
+        <p class="lab">5. Quality</p>
+        <input type="range" id="quality" min="0" max="2" step="1" value="1" disabled aria-label="Quality">
+        <div class="qlabels" id="qlabels"></div>
+      </div>
+      <div class="col">
+        <p class="lab">6. Aspect ratio</p>
+        <div class="btns" id="aspects"></div>
+      </div>
+      <div class="col">
+        <p class="lab">7. Model</p>
+        <div class="dd">
+          <button class="btn dd-btn" id="modelBtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span id="modelLabel">Loading models</span><span>&#9662;</span></button>
+          <div class="menu" id="modelList" role="listbox" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn" id="warn" hidden><span>&#9888;</span><span id="warnText"></span></div>
+    <div class="notice" id="ramNotice" hidden><span>&#9432;</span><span id="ramNoticeText"></span></div>
+    <div class="err-box" id="formError" hidden></div>
+    <button class="render" id="btnRender" type="button">&#9654; Render shot</button>
+
+    <div class="row">
+      <div class="col">
+        <div class="lab-row">
+          <p class="lab">8. Queue</p>
+          <button class="btn small sel" id="btnClear" type="button" aria-disabled="true" title="Removes finished and failed rows. Running and waiting jobs stay.">Clear queue</button>
+        </div>
+        <div class="card queue" id="queue"><div class="q-empty">Nothing in the queue yet</div></div>
+      </div>
+      <div class="col">
+        <div class="lab-row"><p class="lab">Result</p></div>
+        <div class="result" id="resultBox">
+          <span class="result-play" id="resultEmpty">&#9654;</span>
+          <video id="resultVideo" controls hidden></video>
+        </div>
+        <div class="result-row"><span class="result-path" id="resultPath"></span><button class="btn small" id="btnFolder" type="button">Open folder</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

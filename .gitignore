@@ -1,0 +1,8 @@
+inputs/
+outputs/
+.venv/
+state/
+__pycache__/
+.pytest_cache/
+desktop/node_modules/
+CLAUDE.md

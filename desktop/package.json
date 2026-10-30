@@ -1,0 +1,12 @@
+{
+  "name": "lip-service-desktop",
+  "productName": "Lip Service",
+  "version": "0.0.1",
+  "description": "Lip Service desktop window",
+  "main": "main.js",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "45.1.0"
+  }
+}
