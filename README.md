@@ -26,7 +26,7 @@ It works shot by shot, so you stay in control of every take. It supports one sin
 - The backend builds a ComfyUI workflow and runs it through the Comfy SDK and the local `comfy-api-proxy`.
 - The model is InfiniteTalk (MeiGen) on Wan 2.1 image to video 14B, in GGUF form with the lightx2v speed LoRA, so it fits in 12 GB.
 - ComfyUI is restarted after every render so memory never piles up between jobs.
-- The finished video is trimmed to the audio length and your original audio is muxed back on.
+- The finished video is trimmed to the audio length and your original audio is mixed back in.
 
 ## What to expect
 
