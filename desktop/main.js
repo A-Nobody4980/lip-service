@@ -8,7 +8,7 @@ const FS_ONLY = process.argv.includes('--smoke-fs'); // fullscreen check only: n
 const HIDDEN = SMOKE || REAL || FS_ONLY;
 
 // Every Electron path stays inside the project (nothing on the C drive). Set before the app is ready.
-const DATA = 'D:\\Project_lip_service\\state\\electron';
+const DATA = path.join(__dirname, '..', 'state', 'electron');
 for (const [name, dir] of [
   ['appData', DATA], ['userData', path.join(DATA, 'user')], ['sessionData', path.join(DATA, 'session')],
   ['crashDumps', path.join(DATA, 'crashes')], ['logs', path.join(DATA, 'logs')], ['temp', path.join(DATA, 'temp')],

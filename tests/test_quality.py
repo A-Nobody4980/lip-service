@@ -60,10 +60,11 @@ class FakeMgr:
 
 @pytest.fixture()
 def api(tmp_path, monkeypatch):
-    models = tmp_path / "models"
-    models.mkdir()
+    root = tmp_path / "models"
+    models = root / "WanVideo"
+    models.mkdir(parents=True)
     (models / "wan2.1-i2v-14b-480p-Q4_K_M.gguf").write_bytes(b"x")
-    monkeypatch.setattr(server, "MODELS_DIR", models)
+    monkeypatch.setattr(server, "MODELS_DIR", root)
     q = JobQueue(run_fn=lambda s, log: "x.mp4", state_file=tmp_path / "q.json")
     return server.Api(q, FakeMgr(), FakeMgr(), "t"), models, q
 
@@ -118,3 +119,17 @@ def test_bigger_frames_swap_one_more_block_and_smaller_ones_do_not():
     assert hardware.blocks_to_swap(Q6_BYTES, 12227, px["1:1"]) == 26
     assert hardware.blocks_to_swap(Q4_BYTES, 24576, px["1:1"]) == 0       # a big card still keeps it all
     assert all(w % 16 == 0 and h % 16 == 0 for w, h in ((v["width"], v["height"]) for v in ASPECTS.values()))
+
+
+def test_model_list_reads_every_folder_and_skips_the_infinitetalk_weights(api):
+    a, wan, _ = api
+    root = wan.parent
+    (wan / "InfiniteTalk").mkdir()
+    (wan / "InfiniteTalk" / "Wan2_1-InfiniteTalk_Single_Q8.gguf").write_bytes(b"x")
+    (root / "MelBandRoFormer").mkdir()
+    (root / "MelBandRoFormer" / "m.gguf").write_bytes(b"x")
+    (wan / "wan2.1-t2v-14b-Q4_K_M.gguf").write_bytes(b"x")
+    (root / "mine").mkdir()
+    (root / "mine" / "my-i2v.gguf").write_bytes(b"x")
+    ids = [m["id"] for m in a.options()["models"]]
+    assert sorted(ids) == ["WanVideo\\wan2.1-i2v-14b-480p-Q4_K_M.gguf", "mine\\my-i2v.gguf"]

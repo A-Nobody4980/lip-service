@@ -11,11 +11,12 @@ from dataclasses import replace
 from .media import audio_duration, cut_audio_to_wav, mux_original_audio
 from .multi import cut_singer_audios, make_silence, mix_wavs, write_masks
 from . import hardware
+from .comfy_proc import COMFY_SHARED
 from .presets import ASPECTS, BEST_MODEL, Preset, get_preset
 from .workflow import DEFAULT_NEGATIVE, DEFAULT_PROMPT, MAX_SINGERS, build_multi, build_single
 
 PROXY_URL = os.environ.get("LIPSERVICE_PROXY_URL", "http://127.0.0.1:8189")
-COMFY_ROOT = Path(os.environ.get("LIPSERVICE_COMFY_SHARED", r"D:\Comfy-Desktop\ComfyUI-Shared"))
+COMFY_ROOT = COMFY_SHARED
 COMFY_INPUT = COMFY_ROOT / "input"
 COMFY_OUTPUT = COMFY_ROOT / "output"
 PROJECT = Path(__file__).resolve().parent.parent

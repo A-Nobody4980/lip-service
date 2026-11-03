@@ -94,7 +94,7 @@ Removes every `done`, `failed` and `cancelled` row at once and returns `{"remove
 `{"ok": true}`. Only queued jobs can be cancelled; otherwise HTTP 409.
 
 ### POST /open-folder
-Request `{"path": "D:\\Project_lip_service\\outputs"}`. Opens that folder in Explorer. `{"ok": true}`.
+Request `{"path": "D:\\Lip Service\\outputs"}`. Opens that folder in Explorer. `{"ok": true}`.
 
 ## Page requirements that come from this contract
 - Content Security Policy for the page: `default-src 'self'; connect-src http://127.0.0.1:8780; img-src 'self' file: data:; media-src file: blob: http://127.0.0.1:8780; style-src 'self' 'unsafe-inline'; script-src 'self'`. No other network origin is ever allowed.

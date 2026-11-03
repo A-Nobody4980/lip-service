@@ -24,7 +24,9 @@ HOST, PORT = "127.0.0.1", 8780
 IMAGE_TYPES = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 WARN_SECONDS = 12
 DEFAULT_QUALITY = 0.5
-MODELS_DIR = COMFY_ROOT / "models" / "diffusion_models" / "WanVideo"
+MODELS_DIR = COMFY_ROOT / "models" / "diffusion_models"
+# Files in diffusion_models that are not base video models: the InfiniteTalk and vocal isolation weights, and text to video models.
+NOT_BASE_MODELS = ("infinitetalk", "melband", "t2v")
 
 
 class ApiError(Exception):
@@ -35,8 +37,11 @@ class ApiError(Exception):
 
 def model_list():
     models = []
-    for p in sorted(MODELS_DIR.glob("*.gguf")):
-        models.append({"id": "WanVideo\\" + p.name, "label": p.stem.replace("wan2.1", "Wan 2.1").replace("-", " "),
+    for p in sorted(MODELS_DIR.rglob("*.gguf")):
+        rel = p.relative_to(MODELS_DIR).as_posix()
+        if any(s in rel.lower() for s in NOT_BASE_MODELS):
+            continue
+        models.append({"id": rel.replace("/", "\\"), "label": p.stem.replace("wan2.1", "Wan 2.1").replace("-", " "),
                        "default": "Q4_K_M" in p.name})
     if models and not any(m["default"] for m in models):
         models[0]["default"] = True
@@ -91,7 +96,7 @@ class Api:
 
     @staticmethod
     def _best_installed():
-        return (MODELS_DIR / BEST_MODEL.split("\\")[-1]).is_file()
+        return (MODELS_DIR / BEST_MODEL.replace("\\", "/")).is_file()
 
     def _quality_positions(self):
         out = []
